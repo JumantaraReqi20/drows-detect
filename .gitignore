@@ -1,0 +1,45 @@
+# ==========================
+# PYTHON SPECIFIC
+# ==========================
+# Virtual Environment (Sangat penting untuk di-ignore karena ukurannya besar)
+venv/
+env/
+.venv/
+
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ==========================
+# PROJECT LOGS & DATA
+# ==========================
+# Log file hasil deteksi kantuk (Agar tidak mengotori history git)
+drowsiness_log.csv
+*.log
+
+# ==========================
+# SENSITIVE / SECURITY (PENTING!)
+# ==========================
+# Mencegah SSID dan Password WiFi terupload ke publik
+src/wifikeys.h
+
+# ==========================
+# ARDUINO / PLATFORMIO / ESP32
+# ==========================
+# Jika menggunakan PlatformIO
+.pio/
+.vscode/
+
+# Arduino IDE generated files
+*.bin
+*.elf
+*.hex
+*.map
+
+# ==========================
+# OS SYSTEM FILES
+# ==========================
+.DS_Store
+Thumbs.db
