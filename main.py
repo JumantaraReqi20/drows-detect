@@ -10,6 +10,7 @@ import threading
 import csv
 import requests
 from collections import deque
+from smoothing import ExponentialMovingAverage
 
 # ============================
 # CONFIG (Scientific Basis)
@@ -94,8 +95,8 @@ def mouth_aspect_ratio(landmarks, w, h):
     horizontal = euclid(l, r)
     return vertical / horizontal if horizontal != 0 else 0
 
-def ema(prev, val, alpha):
-    return val if prev is None else alpha * val + (1 - alpha) * prev
+# def ema(prev, val, alpha):
+#     return val if prev is None else alpha * val + (1 - alpha) * prev
 
 # --- TAMBAHAN: FUNGSI FLASH ASYNC ---
 def send_flash_request(url):
@@ -172,6 +173,8 @@ writer.writeheader()
 baseline_ear = None
 ear_threshold = None
 
+ear_smoother = ExponentialMovingAverage(alpha=EMA_ALPHA_EAR)
+mar_smoother = ExponentialMovingAverage(alpha=EMA_ALPHA_MAR)
 ema_ear = None
 ema_mar = None
 
@@ -255,9 +258,11 @@ try:
             # EMA smoothing
             # ============================
             if ear_val is not None:
-                ema_ear = ema(ema_ear, ear_val, EMA_ALPHA_EAR)
+                # ema_ear = ema(ema_ear, ear_val, EMA_ALPHA_EAR)
+                ema_ear = ear_smoother.update(ear_val)
             if mar_val is not None:
-                ema_mar = ema(ema_mar, mar_val, EMA_ALPHA_MAR)
+                # ema_mar = ema(ema_mar, mar_val, EMA_ALPHA_MAR)
+                ema_mar = mar_smoother.update(mar_val)
 
             # ============================
             # Yawning detection
@@ -340,6 +345,12 @@ try:
             state = "no_face"
             closed_start_time = None
             alarm.stop_alarm()
+
+            # Reset agar bersih saat wajah terdeteksi lagi
+            ear_smoother.reset()
+            mar_smoother.reset()
+            ema_ear = None
+            ema_mar = None
             
             # TAMBAHAN: Matikan Flash jika wajah hilang
             if flash_is_active:
